@@ -3,13 +3,15 @@ package org.firstinspires;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
 import org.firstinspires.mechanisms.MecanumDrive;
 
-public class MecanumFieldOrientatedOpMode {
+public class MecanumFieldOrientatedOpMode extends OpMode {
     MecanumDrive drive = new MecanumDrive();
     double forward, strafe, rotate;
-    @Override
 
+    @Override
     public void init() {
         drive.init(hardwareMap);
     }

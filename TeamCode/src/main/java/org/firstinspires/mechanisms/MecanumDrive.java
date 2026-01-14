@@ -47,12 +47,13 @@ public class MecanumDrive {
         // need to clamp power to 1
         double maxPower = 1.0;
 
-        // Find the highest absolute max power
+        // Set power settings to absolute values and clamp them to a max of 1
         maxPower = Math.max(maxPower, Math.abs(frontLeftPower));
         maxPower = Math.max(maxPower, Math.abs(backLeftPower));
         maxPower = Math.max(maxPower, Math.abs(frontRightPower));
         maxPower = Math.max(maxPower, Math.abs(backRightPower));
 
+        // Given that logic maxPower will inevitable 1 so why are we dividing by MaxPower?
         frontLeftMotor.setPower(frontLeftPower / maxPower);
         backLeftMotor.setPower(backLeftPower / maxPower);
         frontRightMotor.setPower(frontRightPower / maxPower);
@@ -62,7 +63,7 @@ public class MecanumDrive {
 
     }
 
-    // More intuitive driving method
+    // More intuitive driving method for teleop
     public void driveFieldRelative(double forward, double strafe, double rotate) {
         double theta = Math.atan2(forward, strafe);
         double r = Math.hypot(strafe, forward);
