@@ -6,14 +6,16 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 public class MecanumDrive {
     private DcMotor frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor;
     private IMU imu;
 
     public void init(HardwareMap hwMap) {
         frontLeftMotor = hwMap.get(DcMotor.class, "frontLeft");
-        frontRightMotor = hwMap.get(DcMotor.class, "frontRight");
         backLeftMotor = hwMap.get(DcMotor.class, "backLeft");
+        frontRightMotor = hwMap.get(DcMotor.class, "frontRight");
         backRightMotor = hwMap.get(DcMotor.class, "backRight");
 
         // Reverse half of the four motors 2
@@ -30,13 +32,49 @@ public class MecanumDrive {
         imu = hwMap.get(IMU.class, "imu");
 
         RevHubOrientationOnRobot RevOrientation = new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP;
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD) * 4;
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
 
         imu.initialize(new IMU.Parameters(RevOrientation));
     }
 
     public void drive(double forward, double strafe, double rotate) {
+        double frontLeftPower = forward + strafe + rotate;
+        double backLeftPower = forward - strafe + rotate;
+        double frontRightPower = forward - strafe - rotate;
+        double backRightPower = forward + strafe - rotate;
+
+        // need to clamp power to 1
+        double maxPower = 1.0;
+
+        // Find the highest absolute max power
+        maxPower = Math.max(maxPower, Math.abs(frontLeftPower));
+        maxPower = Math.max(maxPower, Math.abs(backLeftPower));
+        maxPower = Math.max(maxPower, Math.abs(frontRightPower));
+        maxPower = Math.max(maxPower, Math.abs(backRightPower));
+
+        frontLeftMotor.setPower(frontLeftPower / maxPower);
+        backLeftMotor.setPower(backLeftPower / maxPower);
+        frontRightMotor.setPower(frontRightPower / maxPower);
+        backRightMotor.setPower(backRightPower / maxPower);
+
+
 
     }
-}
+
+    // More intuitive driving method
+    public void driveFieldRelative(double forward, double strafe, double rotate) {
+        double theta = Math.atan2(forward, strafe);
+        double r = Math.hypot(strafe, forward);
+
+        theta = AngleUnit.normalizeDegrees(theta -
+                imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+
+        double newForward = r * Math.sin(theta);
+        double newStrafe = r * Math.cos(theta);
+
+        this.drive(newForward, newStrafe, rotate);
+
+
+    }
+ }
