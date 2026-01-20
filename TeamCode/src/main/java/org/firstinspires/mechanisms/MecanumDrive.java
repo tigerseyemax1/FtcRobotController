@@ -53,7 +53,6 @@ public class MecanumDrive {
         maxPower = Math.max(maxPower, Math.abs(frontRightPower));
         maxPower = Math.max(maxPower, Math.abs(backRightPower));
 
-        // Given that logic maxPower will inevitable 1 so why are we dividing by MaxPower?
         frontLeftMotor.setPower(frontLeftPower / maxPower);
         backLeftMotor.setPower(backLeftPower / maxPower);
         frontRightMotor.setPower(frontRightPower / maxPower);
